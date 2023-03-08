@@ -6,6 +6,10 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface MobileAccountDelete {
+    }
+    interface MobileModal {
+    }
     interface MyComponent {
         /**
           * The first name
@@ -20,19 +24,55 @@ export namespace Components {
          */
         "middle": string;
     }
+    interface PcAccountDelete {
+    }
+    interface PcModal {
+    }
 }
 declare global {
+    interface HTMLMobileAccountDeleteElement extends Components.MobileAccountDelete, HTMLStencilElement {
+    }
+    var HTMLMobileAccountDeleteElement: {
+        prototype: HTMLMobileAccountDeleteElement;
+        new (): HTMLMobileAccountDeleteElement;
+    };
+    interface HTMLMobileModalElement extends Components.MobileModal, HTMLStencilElement {
+    }
+    var HTMLMobileModalElement: {
+        prototype: HTMLMobileModalElement;
+        new (): HTMLMobileModalElement;
+    };
     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
     }
     var HTMLMyComponentElement: {
         prototype: HTMLMyComponentElement;
         new (): HTMLMyComponentElement;
     };
+    interface HTMLPcAccountDeleteElement extends Components.PcAccountDelete, HTMLStencilElement {
+    }
+    var HTMLPcAccountDeleteElement: {
+        prototype: HTMLPcAccountDeleteElement;
+        new (): HTMLPcAccountDeleteElement;
+    };
+    interface HTMLPcModalElement extends Components.PcModal, HTMLStencilElement {
+    }
+    var HTMLPcModalElement: {
+        prototype: HTMLPcModalElement;
+        new (): HTMLPcModalElement;
+    };
     interface HTMLElementTagNameMap {
+        "mobile-account-delete": HTMLMobileAccountDeleteElement;
+        "mobile-modal": HTMLMobileModalElement;
         "my-component": HTMLMyComponentElement;
+        "pc-account-delete": HTMLPcAccountDeleteElement;
+        "pc-modal": HTMLPcModalElement;
     }
 }
 declare namespace LocalJSX {
+    interface MobileAccountDelete {
+    }
+    interface MobileModal {
+    }
     interface MyComponent {
         /**
           * The first name
@@ -47,15 +87,27 @@ declare namespace LocalJSX {
          */
         "middle": string;
     }
+    interface PcAccountDelete {
+    }
+    interface PcModal {
+    }
     interface IntrinsicElements {
+        "mobile-account-delete": MobileAccountDelete;
+        "mobile-modal": MobileModal;
         "my-component": MyComponent;
+        "pc-account-delete": PcAccountDelete;
+        "pc-modal": PcModal;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "mobile-account-delete": LocalJSX.MobileAccountDelete & JSXBase.HTMLAttributes<HTMLMobileAccountDeleteElement>;
+            "mobile-modal": LocalJSX.MobileModal & JSXBase.HTMLAttributes<HTMLMobileModalElement>;
             "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "pc-account-delete": LocalJSX.PcAccountDelete & JSXBase.HTMLAttributes<HTMLPcAccountDeleteElement>;
+            "pc-modal": LocalJSX.PcModal & JSXBase.HTMLAttributes<HTMLPcModalElement>;
         }
     }
 }

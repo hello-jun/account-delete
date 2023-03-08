@@ -2,6 +2,22 @@
   "version": 1.1,
   "tags": [
     {
+      "name": "mobile-account-delete",
+      "description": {
+        "kind": "markdown",
+        "value": ""
+      },
+      "attributes": []
+    },
+    {
+      "name": "mobile-modal",
+      "description": {
+        "kind": "markdown",
+        "value": ""
+      },
+      "attributes": []
+    },
+    {
       "name": "my-component",
       "description": {
         "kind": "markdown",
@@ -21,6 +37,22 @@
           "description": "The middle name"
         }
       ]
+    },
+    {
+      "name": "pc-account-delete",
+      "description": {
+        "kind": "markdown",
+        "value": ""
+      },
+      "attributes": []
+    },
+    {
+      "name": "pc-modal",
+      "description": {
+        "kind": "markdown",
+        "value": ""
+      },
+      "attributes": []
     }
   ]
 }
