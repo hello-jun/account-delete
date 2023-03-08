@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 11:46:16
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-08 18:14:33
+ * @LastEditTime: 2023-03-08 18:17:57
  * @Description: 
  * @FilePath: /readme.md
 -->
@@ -96,3 +96,7 @@ The first step for all three of these strategies is to [publish to NPM](https://
 - Run `npm install my-component --save`
 - Add an import to the npm packages `import my-component;`
 - Then you can use the element anywhere in your template, JSX, html etc
+
+## 业务流程
+
+![业务流程图](./%E8%B4%A6%E6%88%B7%E6%B3%A8%E9%94%80%E6%B5%81%E7%A8%8B.png)
