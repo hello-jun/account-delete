@@ -1,4 +1,12 @@
-import { Config } from '@stencil/core';
+/*
+ * @Author: zhangjun
+ * @Date: 2023-03-08 11:46:16
+ * @LastEditors: zhangjun
+ * @LastEditTime: 2023-03-08 15:00:37
+ * @Description: 
+ * @FilePath: /stencil.config.ts
+ */
+import { Config } from '@stencil/core'
 
 export const config: Config = {
   namespace: 'account-delete',
@@ -17,5 +25,9 @@ export const config: Config = {
       type: 'www',
       serviceWorker: null, // disable service workers
     },
+    {
+      type: 'docs-vscode',
+      file: 'vscode-data.json',
+    },
   ],
-};
+}
