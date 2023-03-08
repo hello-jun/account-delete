@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 11:46:16
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-08 15:00:37
+ * @LastEditTime: 2023-03-08 15:38:32
  * @Description: 
  * @FilePath: /stencil.config.ts
  */
@@ -30,4 +30,7 @@ export const config: Config = {
       file: 'vscode-data.json',
     },
   ],
+  devServer: {
+    reloadStrategy: 'pageReload',
+  }
 }
