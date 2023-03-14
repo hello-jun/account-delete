@@ -6,7 +6,9 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { ClientType } from "./components/pc/pc-account-delete/pc-account-delete";
+import { ModalButton } from "./components/pc/pc-modal/pc-modal";
 export { ClientType } from "./components/pc/pc-account-delete/pc-account-delete";
+export { ModalButton } from "./components/pc/pc-modal/pc-modal";
 export namespace Components {
     interface MobileAccountDelete {
     }
@@ -63,6 +65,10 @@ export namespace Components {
         "sendEmailVerificationCodeRequest": () => Promise<boolean>;
     }
     interface PcModal {
+        /**
+          * 按钮组
+         */
+        "buttonGroup": ModalButton[];
     }
 }
 declare global {
@@ -153,6 +159,10 @@ declare namespace LocalJSX {
         "sendEmailVerificationCodeRequest": () => Promise<boolean>;
     }
     interface PcModal {
+        /**
+          * 按钮组
+         */
+        "buttonGroup"?: ModalButton[];
     }
     interface IntrinsicElements {
         "mobile-account-delete": MobileAccountDelete;

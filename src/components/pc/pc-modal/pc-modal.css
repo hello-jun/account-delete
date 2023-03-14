@@ -1,3 +1,75 @@
 :host {
   display: block;
+  width: 464px;
+  background: #ffffff;
+  box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 40px 24px 24px;
+  transform: translateY(-49px);
+  position: relative;
+}
+
+.icon-close {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.icon-close>img{
+  width: inherit;
+  object-fit: contain;
+}
+
+.content {
+  font-size: 16px;
+  font-family: Gotham-Book, Gotham;
+  font-weight: normal;
+  color: #111111;
+  line-height: 24px;
+  text-align: center;
+  max-height: 560px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.button-group .btn {
+  min-width: 196px;
+  height: 40px;
+  border-radius: 22px;
+  border: 1px solid #e64c3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.button-group .btn > span {
+  font-size: 14px;
+  font-family: Gotham-Medium, Gotham;
+  font-weight: 500;
+  color: #e64c3d;
+  line-height: 20px;
+}
+
+.button-group .btn:nth-child(even) {
+  background: #e64c3d;
+}
+.button-group .btn:nth-child(even) > span {
+  color: #ffffff;
+}
+.button-group .btn.only-btn {
+  background: #e64c3d;
+  width: 100%;
+}
+.button-group .btn.only-btn > span {
+  color: #ffffff;
 }
