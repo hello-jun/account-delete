@@ -6,9 +6,9 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { ClientType } from "./components/pc/pc-account-delete/pc-account-delete";
-import { ModalButton } from "./components/pc/pc-modal/pc-modal";
+import { Divider, ModalButton } from "./components/pc/pc-modal/pc-modal";
 export { ClientType } from "./components/pc/pc-account-delete/pc-account-delete";
-export { ModalButton } from "./components/pc/pc-modal/pc-modal";
+export { Divider, ModalButton } from "./components/pc/pc-modal/pc-modal";
 export namespace Components {
     interface MobileAccountDelete {
     }
@@ -69,6 +69,14 @@ export namespace Components {
           * 按钮组
          */
         "buttonGroup": ModalButton[];
+        /**
+          * 弹窗分割线
+         */
+        "divider"?: Divider;
+        /**
+          * 弹窗标题
+         */
+        "modalTitle"?: string;
     }
 }
 declare global {
@@ -163,6 +171,14 @@ declare namespace LocalJSX {
           * 按钮组
          */
         "buttonGroup"?: ModalButton[];
+        /**
+          * 弹窗分割线
+         */
+        "divider"?: Divider;
+        /**
+          * 弹窗标题
+         */
+        "modalTitle"?: string;
     }
     interface IntrinsicElements {
         "mobile-account-delete": MobileAccountDelete;

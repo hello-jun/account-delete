@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 16:23:14
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-14 17:07:51
+ * @LastEditTime: 2023-03-14 19:39:12
  * @Description:
  * @FilePath: /src/components/pc/pc-account-delete/pc-account-delete.tsx
  */
@@ -70,7 +70,10 @@ export class PcAccountDelete {
   render() {
     return (
       <Host>
-        <pc-modal>
+        <pc-modal 
+        modalTitle='Email verification code'
+        divider='both'
+        >
           <div slot="content">
             {/* <p>You are deleting your account. After deleting, all the information, services, rights, data and etc will be deleletd. Please confirm still to continue?</p>
             <p>If select 'Continue', TCL will send verification code to your registered E-mail address.</p> */}
