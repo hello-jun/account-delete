@@ -22,6 +22,7 @@
   position: absolute;
   top: 16px;
   right: 16px;
+  cursor: pointer;
 }
 
 .icon-close > img {

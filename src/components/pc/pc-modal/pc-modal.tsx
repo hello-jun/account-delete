@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 16:20:29
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-14 19:53:47
+ * @LastEditTime: 2023-03-16 01:03:33
  * @Description:
  * @FilePath: /src/components/pc/pc-modal/pc-modal.tsx
  */
@@ -36,12 +36,12 @@ export class PcModal {
   @Prop() buttonGroup: ModalButton[] = [
     {
       text: 'Exit',
-      onClick: () => alert('exit'),
+      onClick: () => null,
     },
     {
       text: 'Continue',
       disabled: true,
-      onClick: () => alert('continue'),
+      onClick: () => null,
     },
   ];
   @Watch('buttonGroup')
@@ -76,6 +76,12 @@ export class PcModal {
     }
   }
 
+  private async closeHandler(ev: MouseEvent) {
+    await customElements.whenDefined('pc-account-delete');
+    const PcAccountDelete = document.querySelector('pc-account-delete');
+    await PcAccountDelete!.close();
+  }
+
   private generateButtonGroup = () => {
     return (
       <Fragment>
@@ -100,7 +106,7 @@ export class PcModal {
     const closeIconSrc = getAssetPath(`../../../assets/images/close@2x.png`);
     return (
       <Host>
-        <div class={'icon-close'}>
+        <div class={'icon-close'} onClick={this.closeHandler}>
           <img src={closeIconSrc} alt="close" />
         </div>
         {Boolean(this.modalTitle) ? <div class={'title'}>{this.modalTitle}</div> : null}

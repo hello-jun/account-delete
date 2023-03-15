@@ -24,6 +24,11 @@ export namespace Components {
          */
         "clientType": ClientType;
         /**
+          * 关闭账号注销组件
+          * @returns
+         */
+        "close": () => Promise<boolean>;
+        /**
           * 提交问卷
          */
         "commitQuestionnaireRequest": () => Promise<boolean>;
@@ -63,6 +68,11 @@ export namespace Components {
           * 发送验证码
          */
         "sendEmailVerificationCodeRequest": () => Promise<boolean>;
+        /**
+          * 显示账号注销组件
+          * @returns
+         */
+        "show": () => Promise<boolean>;
     }
     interface PcModal {
         /**
