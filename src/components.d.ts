@@ -5,9 +5,9 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { ClientType } from "./components/pc/pc-account-delete/pc-account-delete";
+import { ClientType, NECaptchaOption } from "./components/pc/pc-account-delete/pc-account-delete";
 import { Divider, ModalButton } from "./components/pc/pc-modal/pc-modal";
-export { ClientType } from "./components/pc/pc-account-delete/pc-account-delete";
+export { ClientType, NECaptchaOption } from "./components/pc/pc-account-delete/pc-account-delete";
 export { Divider, ModalButton } from "./components/pc/pc-modal/pc-modal";
 export namespace Components {
     interface MobileAccountDelete {
@@ -19,6 +19,10 @@ export namespace Components {
           * 确认验证码
          */
         "ConfirmEmailVerificationCodeRequest": () => Promise<boolean>;
+        /**
+          * 易盾验证码配置
+         */
+        "NECaptcha": NECaptchaOption;
         /**
           * 终端类型
          */
@@ -36,6 +40,11 @@ export namespace Components {
           * 提交注销请求
          */
         "deleteRequest": () => Promise<boolean>;
+        /**
+          * 初始化网易易盾滑块验证码
+          * @param this
+         */
+        "initNECaptchaElement": (this: any) => Promise<void>;
         /**
           * 注销失败回调
          */
@@ -131,6 +140,10 @@ declare namespace LocalJSX {
           * 确认验证码
          */
         "ConfirmEmailVerificationCodeRequest": () => Promise<boolean>;
+        /**
+          * 易盾验证码配置
+         */
+        "NECaptcha"?: NECaptchaOption;
         /**
           * 终端类型
          */
