@@ -18,7 +18,7 @@ export namespace Components {
         /**
           * 确认验证码
          */
-        "ConfirmEmailVerificationCodeRequest": () => Promise<boolean>;
+        "ConfirmEmailVerificationCodeRequest": (code: string) => Promise<boolean>;
         /**
           * 易盾验证码配置
          */
@@ -35,16 +35,20 @@ export namespace Components {
         /**
           * 提交问卷
          */
-        "commitQuestionnaireRequest": () => Promise<boolean>;
+        "commitQuestionnaireRequest": (answer: string) => Promise<boolean>;
         /**
           * 提交注销请求
          */
         "deleteRequest": () => Promise<boolean>;
         /**
+          * 退出注销时处理逻辑
+         */
+        "exitHandler": () => Promise<void>;
+        /**
           * 初始化网易易盾滑块验证码
           * @param this
          */
-        "initNECaptchaElement": (this: any) => Promise<void>;
+        "initNECaptchaElement": (this: any) => Promise<any>;
         /**
           * 注销失败回调
          */
@@ -70,10 +74,6 @@ export namespace Components {
          */
         "queryRegisterEmailRequest": () => Promise<boolean>;
         /**
-          * 请求问卷
-         */
-        "questionnaireRequest": () => Promise<Record<string, any>>;
-        /**
           * 发送验证码
          */
         "sendEmailVerificationCodeRequest": () => Promise<boolean>;
@@ -96,6 +96,46 @@ export namespace Components {
           * 弹窗标题
          */
         "modalTitle"?: string;
+    }
+    interface PcQuestionnaire {
+        /**
+          * 值变化回调函数
+         */
+        "onChanged": (v: string) => void;
+    }
+    interface PcTextField {
+        /**
+          * 是否非法输入
+         */
+        "invalid": boolean;
+        /**
+          * 非法输入消息提示
+         */
+        "invalidMsg": string;
+        /**
+          * 文本框label
+         */
+        "label": string;
+        /**
+          * 最大长度
+         */
+        "maxlength": string | number;
+        /**
+          * 输入发生变化后的回调函数
+         */
+        "onChanged": (val: string) => void;
+        /**
+          * 文本框预设文本
+         */
+        "placeholder": string;
+        /**
+          * 是否有后缀元素修饰
+         */
+        "suffix": boolean;
+        /**
+          * 文本框的值
+         */
+        "value": string;
     }
 }
 declare global {
@@ -123,11 +163,25 @@ declare global {
         prototype: HTMLPcModalElement;
         new (): HTMLPcModalElement;
     };
+    interface HTMLPcQuestionnaireElement extends Components.PcQuestionnaire, HTMLStencilElement {
+    }
+    var HTMLPcQuestionnaireElement: {
+        prototype: HTMLPcQuestionnaireElement;
+        new (): HTMLPcQuestionnaireElement;
+    };
+    interface HTMLPcTextFieldElement extends Components.PcTextField, HTMLStencilElement {
+    }
+    var HTMLPcTextFieldElement: {
+        prototype: HTMLPcTextFieldElement;
+        new (): HTMLPcTextFieldElement;
+    };
     interface HTMLElementTagNameMap {
         "mobile-account-delete": HTMLMobileAccountDeleteElement;
         "mobile-modal": HTMLMobileModalElement;
         "pc-account-delete": HTMLPcAccountDeleteElement;
         "pc-modal": HTMLPcModalElement;
+        "pc-questionnaire": HTMLPcQuestionnaireElement;
+        "pc-text-field": HTMLPcTextFieldElement;
     }
 }
 declare namespace LocalJSX {
@@ -139,7 +193,7 @@ declare namespace LocalJSX {
         /**
           * 确认验证码
          */
-        "ConfirmEmailVerificationCodeRequest": () => Promise<boolean>;
+        "ConfirmEmailVerificationCodeRequest": (code: string) => Promise<boolean>;
         /**
           * 易盾验证码配置
          */
@@ -151,7 +205,7 @@ declare namespace LocalJSX {
         /**
           * 提交问卷
          */
-        "commitQuestionnaireRequest": () => Promise<boolean>;
+        "commitQuestionnaireRequest": (answer: string) => Promise<boolean>;
         /**
           * 提交注销请求
          */
@@ -181,10 +235,6 @@ declare namespace LocalJSX {
          */
         "queryRegisterEmailRequest": () => Promise<boolean>;
         /**
-          * 请求问卷
-         */
-        "questionnaireRequest": () => Promise<Record<string, any>>;
-        /**
           * 发送验证码
          */
         "sendEmailVerificationCodeRequest": () => Promise<boolean>;
@@ -203,11 +253,53 @@ declare namespace LocalJSX {
          */
         "modalTitle"?: string;
     }
+    interface PcQuestionnaire {
+        /**
+          * 值变化回调函数
+         */
+        "onChanged"?: (v: string) => void;
+    }
+    interface PcTextField {
+        /**
+          * 是否非法输入
+         */
+        "invalid"?: boolean;
+        /**
+          * 非法输入消息提示
+         */
+        "invalidMsg"?: string;
+        /**
+          * 文本框label
+         */
+        "label"?: string;
+        /**
+          * 最大长度
+         */
+        "maxlength"?: string | number;
+        /**
+          * 输入发生变化后的回调函数
+         */
+        "onChanged"?: (val: string) => void;
+        /**
+          * 文本框预设文本
+         */
+        "placeholder"?: string;
+        /**
+          * 是否有后缀元素修饰
+         */
+        "suffix"?: boolean;
+        /**
+          * 文本框的值
+         */
+        "value"?: string;
+    }
     interface IntrinsicElements {
         "mobile-account-delete": MobileAccountDelete;
         "mobile-modal": MobileModal;
         "pc-account-delete": PcAccountDelete;
         "pc-modal": PcModal;
+        "pc-questionnaire": PcQuestionnaire;
+        "pc-text-field": PcTextField;
     }
 }
 export { LocalJSX as JSX };
@@ -218,6 +310,8 @@ declare module "@stencil/core" {
             "mobile-modal": LocalJSX.MobileModal & JSXBase.HTMLAttributes<HTMLMobileModalElement>;
             "pc-account-delete": LocalJSX.PcAccountDelete & JSXBase.HTMLAttributes<HTMLPcAccountDeleteElement>;
             "pc-modal": LocalJSX.PcModal & JSXBase.HTMLAttributes<HTMLPcModalElement>;
+            "pc-questionnaire": LocalJSX.PcQuestionnaire & JSXBase.HTMLAttributes<HTMLPcQuestionnaireElement>;
+            "pc-text-field": LocalJSX.PcTextField & JSXBase.HTMLAttributes<HTMLPcTextFieldElement>;
         }
     }
 }

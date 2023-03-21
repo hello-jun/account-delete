@@ -2,78 +2,197 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 11:46:16
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-15 17:16:39
+ * @LastEditTime: 2023-03-21 16:01:25
  * @Description: 
  * @FilePath: /src/index.html
 -->
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
-    <title>Stencil Component Starter</title>
-    <link rel="stylesheet" href="/build/account-delete.css" />
 
-    <script type="module" src="/build/account-delete.esm.js"></script>
-    <script nomodule src="/build/account-delete.js"></script>
-    <!-- <script type="module" src="/build/index.esm.js"></script> -->
-    <!-- <script nomodule src="/build/index.js"></script> -->
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
+  <title>Stencil Component Starter</title>
+  <link rel="stylesheet" href="/build/account-delete.css" />
 
-  <body>
-    <!-- <pc-account-delete></pc-account-delete> -->
-    <button onclick="javascript:showDeleteAccount()" type="button">delete account</button>
-    <button onclick="javascript:closeDeleteAccount()" type="button">close delete account</button>
-    <script>
-      /**
-       * 初始化账号注销组件
-       * -注入参数
-       * -将注销组件插入到DOM中
-       * @param options
-       */
-      function deleteAccountInit(options) {
-        const {
-          queryRegisterEmailRequest,
-          queryPrivacyClauseRequest,
-          queryBusinessStatusRequest,
-          sendEmailVerificationCodeRequest,
-          ConfirmEmailVerificationCodeRequest,
-          questionnaireRequest,
-          commitQuestionnaireRequest,
-          onDeleteSuccess,
-          onDeleteFail,
-          onExitDelete,
-          clientType,
-        } = options;
-        const tagName = `${clientType}-account-delete`;
-        const deleteAccountExist = document.querySelector(tagName);
-        if (deleteAccountExist) {
-          console.error(`The ${tagName} is exist! Do not init it again,please!`);
-          return deleteAccountExist;
-        }
-        const deleteAccount = document.createElement(tagName);
-        Object.assign(deleteAccount, options);
-        document.body.appendChild(deleteAccount);
-        return deleteAccount;
+  <script type="module" src="/build/account-delete.esm.js"></script>
+  <script nomodule src="/build/account-delete.js"></script>
+  <!-- <script type="module" src="/build/index.esm.js"></script> -->
+  <!-- <script nomodule src="/build/index.js"></script> -->
+</head>
+
+<body>
+  <!-- <pc-account-delete></pc-account-delete> -->
+  <button onclick="javascript:showDeleteAccount()" type="button">delete account</button>
+  <button onclick="javascript:closeDeleteAccount()" type="button">close delete account</button>
+  <script>
+
+    let timer = null
+
+    /**
+     * 初始化账号注销组件
+     * -注入参数
+     * -将注销组件插入到DOM中
+     * @param options
+     */
+    function deleteAccountInit(options) {
+      const {
+        queryRegisterEmailRequest,
+        queryPrivacyClauseRequest,
+        queryBusinessStatusRequest,
+        sendEmailVerificationCodeRequest,
+        ConfirmEmailVerificationCodeRequest,
+        commitQuestionnaireRequest,
+        deleteRequest,
+        onDeleteSuccess,
+        onDeleteFail,
+        onExitDelete,
+        clientType,
+      } = options;
+      const tagName = `${clientType}-account-delete`;
+      const deleteAccountExist = document.querySelector(tagName);
+      if (deleteAccountExist) {
+        console.error(`The ${tagName} is exist! Do not init it again,please!`);
+        return deleteAccountExist;
       }
+      const deleteAccount = document.createElement(tagName);
+      Object.assign(deleteAccount, options);
+      document.body.appendChild(deleteAccount);
+      return deleteAccount;
+    }
 
-      async function showDeleteAccount(){
-        await customElements.whenDefined('pc-account-delete')
-        const PcAccountDelete = document.querySelector('pc-account-delete')
-        await PcAccountDelete.show()
-      }
+    async function showDeleteAccount() {
+      await customElements.whenDefined('pc-account-delete')
+      const PcAccountDelete = document.querySelector('pc-account-delete')
+      await PcAccountDelete.show()
+    }
 
-      async function closeDeleteAccount(){
-        await customElements.whenDefined('pc-account-delete')
-        const PcAccountDelete = document.querySelector('pc-account-delete')
-        await PcAccountDelete.close()
-      }
+    async function closeDeleteAccount() {
+      await customElements.whenDefined('pc-account-delete')
+      const PcAccountDelete = document.querySelector('pc-account-delete')
+      await PcAccountDelete.close()
+    }
 
-      window.onload = function () {
-        deleteAccountInit({
-          clientType: 'pc',
-        });
-      };
-    </script>
-  </body>
+    function queryRegisterEmailRequest() {
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random()*2)
+          if (resultIndex) {
+            resolve(resultIndex === 1)
+          } else {
+            reject('queryRegisterEmailRequest fail')
+          }
+        }, 500)
+      })
+    }
+    function queryPrivacyClauseRequest() {
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random())
+          if (resultIndex) {
+            resolve('<h1>条款<h1><p>我是条款</p>')
+          } else {
+            reject('queryPrivacyClauseRequest fail')
+          }
+        }, 500)
+      })
+    }
+    function queryBusinessStatusRequest() {
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random() * 2)
+          if (resultIndex) {
+            resolve(resultIndex === 1)
+          } else {
+            reject(new Error('request timeout'))
+          }
+        }, 1000)
+      })
+    }
+    function sendEmailVerificationCodeRequest() {
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random())
+          if (resultIndex) {
+            resolve(true)
+          } else {
+            reject('sendEmailVerificationCodeRequest fail')
+          }
+        }, 1000)
+      })
+    }
+    function ConfirmEmailVerificationCodeRequest(code) {
+      console.log('#receive code: ', code)
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random())
+          if (true) {
+            resolve(true)
+          } else {
+            reject('ConfirmEmailVerificationCodeRequest fail')
+          }
+        }, 500)
+      })
+    }
+    function commitQuestionnaireRequest(questionnaireContent) {
+      console.log('#receive questionnaireContent: ', questionnaireContent)
+
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random())
+          if (resultIndex) {
+            resolve(true)
+          } else {
+            reject('commitQuestionnaireRequest fail')
+          }
+        }, 1000)
+      })
+    }
+    function deleteRequest() {
+      return new Promise((resolve, reject) => {
+        timer = setTimeout(() => {
+          timer && clearTimeout(timer)
+          const resultIndex = Math.round(Math.random())
+          if (resultIndex) {
+            resolve(true)
+          } else {
+            reject('delete fail')
+          }
+        }, 1000)
+      })
+    }
+
+    function onDeleteSuccess() {
+      alert('onDeleteSuccess')
+    }
+    function onDeleteFail() {
+      alert('onDeleteFail')
+    }
+    function onExitDelete() {
+      alert('onExitDelete')
+    }
+    window.onload = function () {
+      deleteAccountInit({
+        clientType: 'pc',
+        queryRegisterEmailRequest,
+        queryPrivacyClauseRequest,
+        queryBusinessStatusRequest,
+        sendEmailVerificationCodeRequest,
+        ConfirmEmailVerificationCodeRequest,
+        commitQuestionnaireRequest,
+        deleteRequest,
+        onDeleteSuccess,
+        onDeleteFail,
+        onExitDelete,
+      }).show();
+    };
+  </script>
+</body>
+
 </html>

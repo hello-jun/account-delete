@@ -1,12 +1,48 @@
-:host {
+.wrapper {
   display: flex;
-  justify-content:center;
+  justify-content: center;
   align-items: center;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   /* visibility: hidden; */
+}
+.verify-code {
+  margin: 24px 16px auto;
+}
+
+.send-verify-code {
+  height: 20px;
+  font-size: 14px;
+  font-family: Gotham-Medium, Gotham;
+  font-weight: 500;
+  color: #e64c3d;
+  line-height: 20px;
+}
+.send-verify-code.active {
+  color: rgba(45, 49, 50, 0.4);
+}
+
+#captcha{
+  margin-top: 16px;
+}
+
+.captcha-hidden{
+  position: relative;
+  height: 0;
+  overflow: hidden;
+}
+
+.captcha-tip{
+  margin-top: 16px;
+  height: 18px;
+  font-size: 12px;
+  font-family: Gotham-Book, Gotham;
+  font-weight: normal;
+  line-height: 18px;
+  color: #B93043;
+  transition: all 300ms ease;
 }

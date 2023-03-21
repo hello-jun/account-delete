@@ -2,13 +2,13 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 16:23:14
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-17 17:14:50
+ * @LastEditTime: 2023-03-21 20:40:22
  * @Description:
  * @FilePath: /src/components/pc/pc-account-delete/pc-account-delete.tsx
  */
 import { Component, Host, h, Prop, State, Method, Element, Fragment, Watch } from '@stencil/core';
 import { ModalButton, Divider } from '../pc-modal/pc-modal';
-import initNECaptchaWithFallback from '../../../utils/yidun-captcha';
+import '../../../utils/yidun-captcha';
 
 export type ClientType = 'pc' | 'mobile';
 
@@ -17,6 +17,11 @@ export interface NECaptchaOption {
   mode: string;
   enableClose: boolean;
   width: string;
+}
+
+export interface VerifyCodeError {
+  error: boolean;
+  msg: string;
 }
 
 enum DeleteStep {
@@ -36,7 +41,7 @@ console.log('#DeleteStep', DeleteStep);
 
 @Component({
   tag: 'pc-account-delete',
-  styleUrls: ['./pc-account-delete.css','../../../ui/material-components-web.min.css'],
+  styleUrls: ['./pc-account-delete.css', '../../../ui/material-components-web.min.css'],
   scoped: true, // 使用 scoped 让 light dom 的全局样式穿透进来
 })
 export class PcAccountDelete {
@@ -60,15 +65,11 @@ export class PcAccountDelete {
   /**
    * 确认验证码
    */
-  @Prop() ConfirmEmailVerificationCodeRequest!: () => Promise<boolean>;
-  /**
-   * 请求问卷
-   */
-  @Prop() questionnaireRequest!: () => Promise<Record<string, any>>;
+  @Prop() ConfirmEmailVerificationCodeRequest!: (code: string) => Promise<boolean>;
   /**
    * 提交问卷
    */
-  @Prop() commitQuestionnaireRequest!: () => Promise<boolean>;
+  @Prop() commitQuestionnaireRequest!: (answer: string) => Promise<boolean>;
   /**
    * 提交注销请求
    */
@@ -97,10 +98,15 @@ export class PcAccountDelete {
    */
   @Prop() NECaptcha: NECaptchaOption = {
     captchaId: '3d52897607474bf787201909fb95a880',
-    mode: 'float',
+    mode: 'embed',
     enableClose: false,
     width: '100%',
   };
+
+  /**
+   * 是否可见
+   */
+  @State() visible: boolean = false;
 
   /**
    * 账户注销步骤状态:
@@ -125,7 +131,7 @@ export class PcAccountDelete {
    *
    * 8 - 删除操作状态. 成功;
    */
-  @State() deleteStep = DeleteStep.Start;
+  @State() deleteStep = DeleteStep.AboutQuestionnaire;
 
   /**
    * 弹窗内容
@@ -152,12 +158,48 @@ export class PcAccountDelete {
   /**
    * 弹窗分割线
    */
-  @State() divider?: Divider | undefined;
+  @State() divider?: Divider | undefined = 'none';
+
   /**
    * 易盾实例
    */
   @State() captchaIns: any;
+  /**
+   * 易盾滑块是否验证通过
+   */
+  @State() captchaVerified: boolean = false;
+  /**
+   * 验证码
+   */
+  @State() verifyCode: string;
+  /**
+   * 验证码是否错误
+   */
+  @State() verifyCodeError: VerifyCodeError = {
+    error: false,
+    msg: '',
+  };
+  /**
+   * 是否能请求验证码
+   */
+  @State() canSendVerifyCode: boolean = true;
+  /**
+   * 显示验证码发送按钮
+   */
+  @State() showSendBtn: boolean = true;
+  /**
+   * 验证码发送倒计时
+   */
+  @State() sendCountDown: number = 60;
+  /**
+   * 验证码发送次数
+   */
+  @State() sendCounter: number = 0;
 
+  /**
+   * 问卷内容
+   */
+  @State() questionnaireContent: string;
   /**
    * 定时器
    */
@@ -173,13 +215,18 @@ export class PcAccountDelete {
    */
   private refreshedBusinessStatus = false;
 
+    /**
+   * 问卷原因
+   */
+    private questionnaireReason:string = '';
+
   /**
    * 显示账号注销组件
    * @returns
    */
   @Method()
   async show() {
-    this.el.style.visibility = 'visible';
+    this.visible = true;
     return true;
   }
 
@@ -189,7 +236,7 @@ export class PcAccountDelete {
    */
   @Method()
   async close() {
-    this.el.style.visibility = 'hidden';
+    this.visible = false;
     return true;
   }
 
@@ -199,13 +246,20 @@ export class PcAccountDelete {
    */
   @Method()
   async initNECaptchaElement(this: any) {
+    if (this.captchaIns) {
+      return null;
+    }
     const _self = this;
     this.captchaIns && this.captchaIns.validate && delete this.captchaIns.validate; // 清除 没有拿到 validate 之前的 captchaIns
+    // if(this.captchaIns){
+    //   return null
+    // }
+    // @ts-ignore
     initNECaptchaWithFallback(
       {
         // config对象，参数配置
         captchaId: this.NECaptcha.captchaId,
-        element: '#password-captcha',
+        element: '#captcha',
         mode: this.NECaptcha.mode,
         enableClose: this.NECaptcha.enableClose,
         lang: this.lng || 'zh-CN',
@@ -215,6 +269,8 @@ export class PcAccountDelete {
           // todo
           console.log('页面初始化滑动成功后拿到的了 validate', data, err);
           this.captchaIns = Object.assign(this.captchaIns, data);
+
+          this.captchaVerified = !Boolean(err);
 
           // Account.captchaBlur()
         },
@@ -236,17 +292,28 @@ export class PcAccountDelete {
     );
   }
 
+  private handlerQuestionnaireChanged=(v)=>{
+    console.log(v)
+    this.questionnaireReason = v
+  }
+
+  @Watch('visible')
   @Watch('deleteStep')
-  watchStateHandler(newValue: boolean, oldValue: boolean, propName: string) {
+  @Watch('verifyCode')
+  @Watch('sendCountDown')
+  @Watch('verifyCodeError')
+  @Watch('captchaVerified')
+  watchStateHandler(newValue: boolean | string, oldValue: boolean | string, propName: string) {
     console.log(`The old value of ${propName} is: `, oldValue);
     console.log(`The new value of ${propName} is: `, newValue);
-    this.generateModalContentAndButtonGroup();
+    if (oldValue !== newValue) {
+      this.generateModalContentAndButtonGroup();
+    }
   }
 
   connectedCallback() {
     console.log('connectedCallback');
-    this.generateModalContentAndButtonGroup();
-    this.initNECaptchaElement();
+    this.visible && this.generateModalContentAndButtonGroup();
   }
   componentWillLoad() {
     console.log('componentWillLoad');
@@ -273,106 +340,57 @@ export class PcAccountDelete {
   /**
    * 退出注销时处理逻辑
    */
-  private exitHandler() {
+  @Method()
+  async exitHandler() {
     this.close();
     this.onExitDelete && this.onExitDelete();
   }
 
-  private generateModalButtonGroup() {
-    const leftButtonDefault = {
-      text: 'Exit',
-      onClick: this.exitHandler,
-    };
-    const rightButtonDefault = {
-      text: 'Continue',
-      onClick: this.exitHandler,
-    };
-    switch (this.deleteStep) {
-      case 0:
-        break;
-      case 1:
-        this.modalButtonGroup = [
-          leftButtonDefault,
-          {
-            ...rightButtonDefault,
-            onClick: () => {
-              //检查是否有注册邮箱
-              this.deleteStep = 2;
-            },
-          },
-        ];
-        break;
-      case 2:
-      case 3:
-      case 4:
-        this.modalButtonGroup = [leftButtonDefault];
-        break;
-      case 5:
-        // 倒计时10s 强制阅读
-        let timeCount = 10;
-        this.timer && clearInterval(this.timer);
-        this.timer = setInterval(() => {
-          timeCount--;
-          if (timeCount <= 0) {
-            clearInterval(this.timer);
-            this.deleteStep = 6;
-          }
-          this.modalButtonGroup = [
-            leftButtonDefault,
-            {
-              ...rightButtonDefault,
-              text: `Continue (${timeCount})`,
-              disabled: true,
-              onClick: () => null,
-            },
-          ];
-        }, 1000);
-        break;
-      case 6:
-        this.modalButtonGroup = [
-          leftButtonDefault,
-          {
-            ...rightButtonDefault,
-            onClick: () => {
-              this.deleteStep = 8;
-            },
-          },
-        ];
-        break;
-      case 7:
-        this.modalButtonGroup = [
-          leftButtonDefault,
-          {
-            ...rightButtonDefault,
-            text: 'Refresh',
-            onClick: () => {
-              this.deleteStep = 5;
-            },
-          },
-        ];
-        break;
-      case 8:
-        this.modalContent = (
-          <Fragment>
-            <p>You are deleting your account. After deleting, all the information, services, rights, data and etc will be deleletd. Please confirm still to continue?</p>
-            <p>If select 'Continue', TCL will send verification code to your registered E-mail address.</p>
-          </Fragment>
-        );
-        break;
-      default:
-        this.modalContent = null;
-        break;
+  /**
+   * 发送邮件验证码
+   */
+  private sendVerifyCode = () => {
+    if (!this.canSendVerifyCode) {
+      return null;
     }
-  }
+    this.sendEmailVerificationCodeRequest && this.sendEmailVerificationCodeRequest();
+    // 倒计时60s 强制阅读
+    let timeCount = 60;
+    this.timer && clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      timeCount--;
+      if (timeCount < 1) {
+        clearInterval(this.timer);
+        this.showSendBtn = true;
+        this.sendCountDown = 60;
+        this.canSendVerifyCode = true;
+        return;
+      } else {
+        this.canSendVerifyCode = false;
+        this.showSendBtn = false;
+        this.sendCountDown = timeCount;
+      }
+    }, 1000);
+  };
+
+  private handlerChanged = (val: string) => {
+    this.verifyCode = val;
+    this.verifyCodeError = {
+      error: false,
+      msg: '',
+    };
+  };
 
   private generateModalContentAndButtonGroup() {
+    this.modalTitle = null;
+    this.divider = 'none';
     const leftButtonDefault = {
       text: 'Exit',
-      onClick: this.exitHandler,
+      onClick: this.exitHandler.bind(this),
     };
     const rightButtonDefault = {
       text: 'Continue',
-      onClick: this.exitHandler,
+      onClick: this.exitHandler.bind(this),
     };
     switch (this.deleteStep) {
       case DeleteStep.Exit:
@@ -545,52 +563,167 @@ export class PcAccountDelete {
               this.queryBusinessDelayTimer && clearTimeout(this.queryBusinessDelayTimer);
             });
         };
+        businessStatusRequest();
 
         break;
       case DeleteStep.AboutVerifyCode:
-        
-        break;
-      case 5:
-        this.queryPrivacyClauseRequest()
-          .then(res => {
-            this.modalContent = (
+        this.initNECaptchaElement();
+        this.modalTitle = 'Email verification code';
+        this.divider = 'both';
+        this.modalButtonGroup = [
+          leftButtonDefault,
+          {
+            ...rightButtonDefault,
+            text: 'Verification',
+            onClick: () => {
+              //1. 检验验证码是否有填入
+              if (this.verifyCode === '' || !Boolean(this.verifyCode)) {
+                this.verifyCodeError = {
+                  error: true,
+                  msg: 'Please enter the verification code.',
+                };
+                return null;
+              }
+              console.log(this.sendCounter);
+              //2. 超过5次验证失败,需要完成滑块图形验证码
+              if (this.sendCounter >= 5 && !this.captchaVerified) {
+                return null;
+              }
+              //3. 提交验证码
+              //4. 处理提交结果
+              this.ConfirmEmailVerificationCodeRequest(this.verifyCode)
+                .then(res => {
+                  if (res) {
+                    this.deleteStep = DeleteStep.AboutQuestionnaire;
+                  }
+                })
+                .catch(e => {
+                  if (e instanceof Error) {
+                    this.deleteStep = DeleteStep.Exception;
+                  } else {
+                    this.verifyCodeError = {
+                      error: true,
+                      msg: e,
+                    };
+                    this.sendCounter += 1;
+                  }
+                });
+            },
+          },
+        ];
+        this.modalContent = (
+          <div class="verify-code">
+            <pc-text-field
+              label="Verification code*"
+              value={this.verifyCode}
+              maxlength="6"
+              placeholder="Verification code*"
+              invalid={this.verifyCodeError.error}
+              invalidMsg={this.verifyCodeError.msg}
+              onChanged={this.handlerChanged}
+            >
               <Fragment>
-                <pre>{res}</pre>
+                <div class="verifyBar pointer" slot="suffix">
+                  {this.showSendBtn ? (
+                    <div class={`send-verify-code`} onClick={this.sendVerifyCode}>
+                      Send
+                    </div>
+                  ) : (
+                    <div class="send-verify-code active">{this.sendCountDown}s</div>
+                  )}
+                </div>
               </Fragment>
-            );
-          })
-          .catch(() => {
-            this.deleteStep = -1;
-          });
-        break;
-      case 7:
-        this.modalContent = (
-          <Fragment>
-            <p>Loading failure, please refresh.</p>
-          </Fragment>
+            </pc-text-field>
+            <div id="captcha" class={`${this.sendCounter >= 4 ? '' : 'captcha-hidden'}`}></div>
+            {this.sendCounter >= 4 && !this.captchaVerified ? <div class={'captcha-tip'}>请滑动拼图到合适位置完成图形验证*{this.captchaVerified}</div> : null}
+          </div>
         );
         break;
-      case 8:
+      case DeleteStep.AboutQuestionnaire:
+        // TODO 问卷内容
+        this.modalContent=(
+          <Fragment>
+            <pc-questionnaire
+            onChanged={this.handlerQuestionnaireChanged}
+            ></pc-questionnaire>
+          </Fragment>
+        )
+        this.modalButtonGroup = [
+          leftButtonDefault,
+          {
+            ...rightButtonDefault,
+            onClick: () => {
+              // 提交问卷
+              this.commitQuestionnaireRequest(this.questionnaireContent)
+                .then(res => {
+                  // TODO 提交问卷结果
+                  this.deleteStep = DeleteStep.Confirm;
+                })
+                .catch(e => {
+                  this.deleteStep = DeleteStep.Exception;
+                });
+            },
+          },
+        ];
+        break;
+      case DeleteStep.Confirm:
         this.modalContent = (
           <Fragment>
-            <p>You are deleting your account. After deleting, all the information, services, rights, data and etc will be deleletd. Please confirm still to continue?</p>
-            <p>If select 'Continue', TCL will send verification code to your registered E-mail address.</p>
+            <p>Finally decide to delete account?</p>
           </Fragment>
         );
+        this.modalButtonGroup = [
+          leftButtonDefault,
+          {
+            ...rightButtonDefault,
+            text: 'Confirm',
+            onClick: () => {
+              // 提交注销请求
+              console.log(this);
+              this.deleteRequest()
+                .then(res => {
+                  if (res) {
+                    this.deleteStep = DeleteStep.Success;
+                  }
+                })
+                .catch(e => {
+                  this.deleteStep = DeleteStep.Exception;
+                });
+            },
+          },
+        ];
+        break;
+      case DeleteStep.Success:
+        this.modalContent = (
+          <Fragment>
+            <p>Account is deleted successfully, data will be totally eliminated within 48 hours.</p>
+          </Fragment>
+        );
+        this.modalButtonGroup = [
+          {
+            ...leftButtonDefault,
+            onClick: () => {
+              this.exitHandler();
+              this.onDeleteSuccess && this.onDeleteSuccess();
+            },
+          },
+        ];
         break;
       default:
         this.modalContent = <p>Unknown Error</p>;
+        this.modalButtonGroup = [leftButtonDefault];
         break;
     }
   }
 
   render() {
-    return (
-      <Host>
+    console.log(this.visible);
+    return this.visible ? (
+      <div class={'wrapper'}>
         <pc-modal modalTitle={this.modalTitle} divider={this.divider} buttonGroup={this.modalButtonGroup}>
           <div slot="content">{this.modalContent}</div>
         </pc-modal>
-      </Host>
-    );
+      </div>
+    ) : null;
   }
 }

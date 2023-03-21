@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 16:20:29
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-16 01:03:33
+ * @LastEditTime: 2023-03-21 16:08:01
  * @Description:
  * @FilePath: /src/components/pc/pc-modal/pc-modal.tsx
  */
@@ -19,9 +19,9 @@ export interface ModalButton {
  * top - 显示顶部分割线;
  * bottom - 显示底部分割线;
  */
-export type Divider = 'both' | 'top' | 'bottom';
+export type Divider = 'both' | 'top' | 'bottom' | 'none';
 
-const dividerList = ['both', 'top', 'bottom'];
+const dividerList = ['both', 'top', 'bottom', 'none'];
 
 @Component({
   tag: 'pc-modal',
@@ -63,23 +63,26 @@ export class PcModal {
    */
   @Prop() divider?: Divider;
   @Watch('divider')
-  validateName(newValue: string, _oldValue: string) {
+  validateDivider(newValue: string, _oldValue: string) {
+    console.log('#validateDivider', newValue, _oldValue);
+
     // don't allow `divider` to be the empty string
     const isBlank = typeof newValue !== 'string' || newValue === '';
     if (isBlank) {
-      throw new Error(`divider value should be one of 'both'|'top'|'bottom'.`);
+      // throw new Error(`divider value should be one of 'both'|'top'|'bottom'|'none'.`);
+      return true
     }
     // don't allow `divider` is not 'both'|'top'|'bottom'
     const effective = dividerList.includes(this.divider as string);
     if (!effective) {
-      throw new Error(`divider value should be one of 'both'|'top'|'bottom'.`);
+      throw new Error(`divider value should be one of 'both'|'top'|'bottom'|'none'.`);
     }
   }
 
   private async closeHandler(ev: MouseEvent) {
     await customElements.whenDefined('pc-account-delete');
     const PcAccountDelete = document.querySelector('pc-account-delete');
-    await PcAccountDelete!.close();
+    await PcAccountDelete!.exitHandler();
   }
 
   private generateButtonGroup = () => {

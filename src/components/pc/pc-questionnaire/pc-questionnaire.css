@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.options {
+  text-align: left;
+}
+
+.options div:first-of-type {
+  margin-top: 8px;
+}
+
+.radio-item {
+  display: flex;
+  margin-top: 16px;
+  align-items: baseline;
+}
+
+.radio-item:first-of-type {
+  margin-top: 0;
+}
+
+.radio-item label {
+  margin-left: 8px;
+}
+
+.textarea {
+  position: relative;
+  margin-top: 8px;
+  box-sizing: border-box;
+  line-height: 0;
+}
+.textarea textarea {
+  border: none;
+  resize: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  background: #f4f5f7;
+  border-radius: 8px;
+  margin-right: 8px;
+  box-sizing: border-box;
+}
+
+.textarea span {
+  position: absolute;
+  height: 14px;
+  font-size: 10px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(33, 33, 38, 0.4);
+  line-height: 14px;
+  bottom: 6px;
+  right: 12px;
+}

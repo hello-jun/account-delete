@@ -2,11 +2,12 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 11:46:16
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-14 15:28:29
+ * @LastEditTime: 2023-03-20 14:14:53
  * @Description: 
  * @FilePath: /stencil.config.ts
  */
 import { Config } from '@stencil/core'
+import { sass } from '@stencil/sass';
 
 export const config: Config = {
   namespace: 'account-delete',
@@ -33,5 +34,8 @@ export const config: Config = {
   ],
   devServer: {
     reloadStrategy: 'pageReload',
-  }
+  },
+  plugins: [
+    sass()
+  ]
 }
