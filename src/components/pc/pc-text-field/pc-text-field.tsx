@@ -2,11 +2,11 @@
  * @Author: zhangjun
  * @Date: 2023-03-17 15:08:03
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-21 17:47:44
+ * @LastEditTime: 2023-03-22 16:33:17
  * @Description: 受控组件
  * @FilePath: /src/components/pc/pc-text-field/pc-text-field.tsx
  */
-import { Component, Host, h, Prop, State, Event, Listen, EventEmitter } from '@stencil/core';
+import { Component, Host, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'pc-text-field',
@@ -49,19 +49,15 @@ export class PcTextField {
   @Prop() onChanged: (val: string) => void;
 
   private handlerInput = (e: InputEvent) => {
-    console.log((e.target as HTMLInputElement).value, this.value);
     let val = (e.target as HTMLInputElement).value;
     this.onChanged && this.onChanged(val);
   };
   private handlerBlur = (e: FocusEvent) => {
-    console.log('#handlerBlur', (e.target as HTMLInputElement).value);
     let val = (e.target as HTMLInputElement).value;
     this.onChanged && this.onChanged(val);
   };
 
   render() {
-    console.log('this', this);
-    const _ = this;
     return (
       <Host>
         <div class={`text-field ${this.invalid ? 'text-field-invalid' : ''}`}>

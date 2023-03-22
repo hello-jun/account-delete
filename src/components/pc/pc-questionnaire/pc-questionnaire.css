@@ -4,6 +4,7 @@
 
 .options {
   text-align: left;
+  margin-top: 24px;
 }
 
 .options div:first-of-type {
@@ -13,7 +14,6 @@
 .radio-item {
   display: flex;
   margin-top: 16px;
-  align-items: baseline;
 }
 
 .radio-item:first-of-type {
@@ -21,7 +21,28 @@
 }
 
 .radio-item label {
+  flex: 1;
   margin-left: 8px;
+}
+
+.radio-item input {
+  appearance: none;
+
+  width: 20px;
+  height: 20px;
+
+  background: url('../../../assets/images/unchecked.png') no-repeat;
+  background-size: contain;
+
+  margin-top: 2px;
+
+  transition: 0.2s all linear;
+
+}
+
+.radio-item input:checked {
+  background: url('../../../assets/images/checked.png') no-repeat;
+  background-size: contain;
 }
 
 .textarea {

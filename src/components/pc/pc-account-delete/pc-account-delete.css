@@ -26,23 +26,42 @@
   color: rgba(45, 49, 50, 0.4);
 }
 
-#captcha{
+#captcha {
   margin-top: 16px;
 }
 
-.captcha-hidden{
+.captcha-hidden {
   position: relative;
   height: 0;
   overflow: hidden;
 }
 
-.captcha-tip{
+.captcha-tip {
   margin-top: 16px;
   height: 18px;
   font-size: 12px;
   font-family: Gotham-Book, Gotham;
   font-weight: normal;
   line-height: 18px;
-  color: #B93043;
+  color: #b93043;
   transition: all 300ms ease;
+}
+
+.privacy-clause-title {
+  height: 30px;
+  font-size: 20px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: #111111;
+  line-height: 30px;
+}
+.privacy-clause-content {
+  font-size: 16px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: rgba(17, 17, 17, 0.7);
+  line-height: 24px;
+  text-align: left;
+  white-space: pre-wrap;
+  margin-top: 16px;
 }

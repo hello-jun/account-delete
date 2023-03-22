@@ -5,9 +5,9 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { ClientType, NECaptchaOption } from "./components/pc/pc-account-delete/pc-account-delete";
+import { ClientType, NECaptchaOption, PrivacyClause } from "./components/pc/pc-account-delete/pc-account-delete";
 import { Divider, ModalButton } from "./components/pc/pc-modal/pc-modal";
-export { ClientType, NECaptchaOption } from "./components/pc/pc-account-delete/pc-account-delete";
+export { ClientType, NECaptchaOption, PrivacyClause } from "./components/pc/pc-account-delete/pc-account-delete";
 export { Divider, ModalButton } from "./components/pc/pc-modal/pc-modal";
 export namespace Components {
     interface MobileAccountDelete {
@@ -41,6 +41,11 @@ export namespace Components {
          */
         "deleteRequest": () => Promise<boolean>;
         /**
+          * 销毁账号注销组件
+          * @returns
+         */
+        "destroy": () => Promise<boolean>;
+        /**
           * 退出注销时处理逻辑
          */
         "exitHandler": () => Promise<void>;
@@ -68,7 +73,7 @@ export namespace Components {
         /**
           * 查询隐私条款
          */
-        "queryPrivacyClauseRequest": () => Promise<String>;
+        "queryPrivacyClauseRequest": () => Promise<PrivacyClause>;
         /**
           * 查询注册邮箱
          */
@@ -229,7 +234,7 @@ declare namespace LocalJSX {
         /**
           * 查询隐私条款
          */
-        "queryPrivacyClauseRequest": () => Promise<String>;
+        "queryPrivacyClauseRequest": () => Promise<PrivacyClause>;
         /**
           * 查询注册邮箱
          */

@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 16:23:14
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-21 20:40:22
+ * @LastEditTime: 2023-03-22 16:29:27
  * @Description:
  * @FilePath: /src/components/pc/pc-account-delete/pc-account-delete.tsx
  */
@@ -24,6 +24,11 @@ export interface VerifyCodeError {
   msg: string;
 }
 
+export interface PrivacyClause {
+  title: string;
+  content: string;
+}
+
 enum DeleteStep {
   Exception = -1,
   Exit,
@@ -41,11 +46,12 @@ console.log('#DeleteStep', DeleteStep);
 
 @Component({
   tag: 'pc-account-delete',
-  styleUrls: ['./pc-account-delete.css', '../../../ui/material-components-web.min.css'],
+  styleUrls: ['./pc-account-delete.css'],
   scoped: true, // 使用 scoped 让 light dom 的全局样式穿透进来
 })
 export class PcAccountDelete {
-  @Element() el!: HTMLPcAccountDeleteElement;
+  @Element() el: HTMLPcAccountDeleteElement;
+
   /**
    * 查询注册邮箱
    */
@@ -53,7 +59,7 @@ export class PcAccountDelete {
   /**
    * 查询隐私条款
    */
-  @Prop() queryPrivacyClauseRequest!: () => Promise<String>;
+  @Prop() queryPrivacyClauseRequest!: () => Promise<PrivacyClause>;
   /**
    * 查询业务状态
    */
@@ -131,7 +137,7 @@ export class PcAccountDelete {
    *
    * 8 - 删除操作状态. 成功;
    */
-  @State() deleteStep = DeleteStep.AboutQuestionnaire;
+  @State() deleteStep = DeleteStep.Start;
 
   /**
    * 弹窗内容
@@ -195,11 +201,6 @@ export class PcAccountDelete {
    * 验证码发送次数
    */
   @State() sendCounter: number = 0;
-
-  /**
-   * 问卷内容
-   */
-  @State() questionnaireContent: string;
   /**
    * 定时器
    */
@@ -215,10 +216,10 @@ export class PcAccountDelete {
    */
   private refreshedBusinessStatus = false;
 
-    /**
+  /**
    * 问卷原因
    */
-    private questionnaireReason:string = '';
+  private questionnaireReason: string = '';
 
   /**
    * 显示账号注销组件
@@ -236,9 +237,20 @@ export class PcAccountDelete {
    */
   @Method()
   async close() {
+    this.reset();
     this.visible = false;
     return true;
   }
+
+    /**
+   * 销毁账号注销组件
+   * @returns
+   */
+    @Method()
+    async destroy() {
+      document.body.removeChild(this.el)
+      return true;
+    }
 
   /**
    * 初始化网易易盾滑块验证码
@@ -292,10 +304,52 @@ export class PcAccountDelete {
     );
   }
 
-  private handlerQuestionnaireChanged=(v)=>{
-    console.log(v)
-    this.questionnaireReason = v
-  }
+  private handlerQuestionnaireChanged = v => {
+    // console.log(v)
+    this.questionnaireReason = v;
+  };
+
+  /**
+   * 清除所有的定时器
+   */
+  private clearAllTimer = () => {
+    this.timer && clearInterval(this.timer);
+    this.queryBusinessDelayTimer && clearInterval(this.queryBusinessDelayTimer);
+  };
+
+  /**
+   * 重置状态
+   */
+  private reset = () => {
+    this.clearAllTimer();
+    this.deleteStep = DeleteStep.Start;
+    this.modalContent = null;
+    this.modalButtonGroup = [
+      {
+        text: 'Exit',
+        onClick: () => null,
+      },
+      {
+        text: 'Continue',
+        onClick: () => null,
+      },
+    ];
+    this.modalTitle = '';
+    this.divider = 'none';
+    this.captchaIns = null;
+    this.captchaVerified = false;
+    this.verifyCode = '';
+    this.verifyCodeError = {
+      error: false,
+      msg: '',
+    };
+    this.canSendVerifyCode = true;
+    this.showSendBtn = true;
+    this.sendCountDown = 60;
+    this.sendCounter = 0;
+    this.refreshedBusinessStatus = false;
+    this.questionnaireReason = '';
+  };
 
   @Watch('visible')
   @Watch('deleteStep')
@@ -306,34 +360,16 @@ export class PcAccountDelete {
   watchStateHandler(newValue: boolean | string, oldValue: boolean | string, propName: string) {
     console.log(`The old value of ${propName} is: `, oldValue);
     console.log(`The new value of ${propName} is: `, newValue);
-    if (oldValue !== newValue) {
-      this.generateModalContentAndButtonGroup();
-    }
+
+    this.generateModalContentAndButtonGroup();
   }
 
   connectedCallback() {
     console.log('connectedCallback');
     this.visible && this.generateModalContentAndButtonGroup();
   }
-  componentWillLoad() {
-    console.log('componentWillLoad');
-  }
-  componentWillRender() {
-    console.log('componentWillRender');
-  }
-  componentDidRender() {
-    console.log('componentDidRender');
-  }
-  componentShouldUpdate() {
-    console.log('componentShouldUpdate');
-  }
-  componentWillUpdate() {
-    console.log('componentWillUpdate');
-  }
-  componentDidUpdate() {
-    console.log('componentDidUpdate');
-  }
   disconnectedCallback() {
+    this.clearAllTimer();
     console.log('disconnectedCallback');
   }
 
@@ -419,6 +455,16 @@ export class PcAccountDelete {
           .then(res => {
             if (res) {
               this.deleteStep = DeleteStep.AboutPrivacyClause;
+              // 平滑转场到隐私政策显示
+              this.modalButtonGroup = [
+                leftButtonDefault,
+                {
+                  ...rightButtonDefault,
+                  text: `Continue (10)`,
+                  disabled: true,
+                  onClick: () => null,
+                },
+              ];
             } else {
               this.modalContent = (
                 <Fragment>
@@ -439,7 +485,8 @@ export class PcAccountDelete {
               if (typeof res !== 'undefined') {
                 this.modalContent = (
                   <Fragment>
-                    <pre>{res}</pre>
+                    <span class={'privacy-clause-title'}>{res.title}</span>
+                    <p class={'privacy-clause-content'}>{res.content}</p>
                   </Fragment>
                 );
                 // 倒计时10s 强制阅读
@@ -584,7 +631,6 @@ export class PcAccountDelete {
                 };
                 return null;
               }
-              console.log(this.sendCounter);
               //2. 超过5次验证失败,需要完成滑块图形验证码
               if (this.sendCounter >= 5 && !this.captchaVerified) {
                 return null;
@@ -606,6 +652,10 @@ export class PcAccountDelete {
                       msg: e,
                     };
                     this.sendCounter += 1;
+                    if (this.sendCounter >= 5) {
+                      this.captchaIns.refresh()
+                      this.captchaVerified = false
+                    }
                   }
                 });
             },
@@ -640,23 +690,20 @@ export class PcAccountDelete {
         );
         break;
       case DeleteStep.AboutQuestionnaire:
-        // TODO 问卷内容
-        this.modalContent=(
+        this.timer && clearInterval(this.timer);
+        this.modalContent = (
           <Fragment>
-            <pc-questionnaire
-            onChanged={this.handlerQuestionnaireChanged}
-            ></pc-questionnaire>
+            <pc-questionnaire onChanged={this.handlerQuestionnaireChanged}></pc-questionnaire>
           </Fragment>
-        )
+        );
         this.modalButtonGroup = [
           leftButtonDefault,
           {
             ...rightButtonDefault,
             onClick: () => {
               // 提交问卷
-              this.commitQuestionnaireRequest(this.questionnaireContent)
+              this.commitQuestionnaireRequest(this.questionnaireReason)
                 .then(res => {
-                  // TODO 提交问卷结果
                   this.deleteStep = DeleteStep.Confirm;
                 })
                 .catch(e => {
@@ -679,7 +726,6 @@ export class PcAccountDelete {
             text: 'Confirm',
             onClick: () => {
               // 提交注销请求
-              console.log(this);
               this.deleteRequest()
                 .then(res => {
                   if (res) {
@@ -717,7 +763,6 @@ export class PcAccountDelete {
   }
 
   render() {
-    console.log(this.visible);
     return this.visible ? (
       <div class={'wrapper'}>
         <pc-modal modalTitle={this.modalTitle} divider={this.divider} buttonGroup={this.modalButtonGroup}>

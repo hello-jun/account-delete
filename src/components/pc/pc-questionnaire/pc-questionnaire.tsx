@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-21 16:17:21
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-21 20:38:08
+ * @LastEditTime: 2023-03-22 14:17:48
  * @Description:
  * @FilePath: /src/components/pc/pc-questionnaire/pc-questionnaire.tsx
  */
@@ -59,6 +59,15 @@ export class PcQuestionnaire {
       this.textareaValue = (e.target as HTMLInputElement).value;
     }
   }
+
+  connectedCallback(){
+    this.onChanged && this.onChanged(this.options[0]);
+  }
+
+  // @Listen('focus')
+  // handlerFocus(e){
+  //   console.log(e)
+  // }
 
   private options: string[] = [
     'Have another TCL account and delete the unused one',

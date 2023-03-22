@@ -2,7 +2,7 @@
  * @Author: zhangjun
  * @Date: 2023-03-08 16:20:29
  * @LastEditors: zhangjun
- * @LastEditTime: 2023-03-21 16:08:01
+ * @LastEditTime: 2023-03-22 16:32:49
  * @Description:
  * @FilePath: /src/components/pc/pc-modal/pc-modal.tsx
  */
@@ -46,7 +46,6 @@ export class PcModal {
   ];
   @Watch('buttonGroup')
   validateButtonGroup(nv: ModalButton[], _ov: ModalButton[]) {
-    console.log('#buttonGroup', nv, _ov);
     const limitExceeded = !Boolean(nv) || !Boolean(nv.length) || nv.length > 2;
     if (limitExceeded) {
       throw new Error('buttonGroup is a list ,which length is between 1~2.');
@@ -64,8 +63,6 @@ export class PcModal {
   @Prop() divider?: Divider;
   @Watch('divider')
   validateDivider(newValue: string, _oldValue: string) {
-    console.log('#validateDivider', newValue, _oldValue);
-
     // don't allow `divider` to be the empty string
     const isBlank = typeof newValue !== 'string' || newValue === '';
     if (isBlank) {
